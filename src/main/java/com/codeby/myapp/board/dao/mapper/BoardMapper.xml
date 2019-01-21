@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.codeby.myapp.board.dao.IBoardRepository">
+	<select id ="selectArticleListByCategory" parameterType="map" resultType="com.codeby.myapp.board.model.Board">
+	<![CDATA[
+		SELECT
+			BOARD_ID		AS "boardId",
+			CATEGORY_ID		AS "categoryId",
+			WRITER			AS "writer",
+			EMAIL			AS "email",
+			TITLE			AS "title",
+			WRITE_DATE		AS "writeDate",
+			MASTER_ID		AS "masterId",
+			REPLY_NUMBER	AS "replyNumber",
+			REPLY_STEP		AS "replyStep",
+			READ_COUNT		AS "readCount",
+			RNUM+1			AS "seq"
+		FROM (
+			SELECT
+				BOARD_ID,
+				CATEGORY_ID,
+				WRITER,
+				EMAIL,
+				TITLE,
+				WRITE_DATE,
+				MASTER_ID,
+				REPLY_NUMBER,
+				REPLY_STEP,
+				READ_COUNT,
+				ROWNUM AS RNUM
+			FROM (
+				SELECT * FROM BOARD
+				WHERE CATEGORY_ID=#{categoryId}
+				ORDER BY MASTER_ID DESC, REPLY_NUMBER, REPLY_STEP
+			)
+		)
+		WHERE RNUM BETWEEN #{start} AND #{end}
+	]]>
+	</select>
+	
+	<select id="selectArticle" parameterType="int" resultType="com.codeby.myapp.board.model.Board">
+	<![CDATA[
+		SELECT 
+			BOARD.BOARD_ID			AS "boardId",
+			CATEGORY_ID				AS "categoryId",
+			WRITER					AS "writer",
+			EMAIL					AS "email",
+			TITLE					AS "title",
+			CONTENT					AS "content",
+			READ_CONTENT			AS "readCount",
+			WRITE_DATE				AS "writeDate",
+			MASTER_ID				AS "masterId",
+			REPLY_NUMBER			AS "replyNumber",
+			REPLY_STEP				AS "replyStep",
+			BOARD_UPLOAD_FILE.FILE_ID	AS "fileId",
+			BOARD_UPLOAD_FILE.FILE_NAME	AS "fileName",
+			BOARD_UPLOAD_FILE.FILE_SIZE	AS "fileSize",
+			BOARD_UPLOAD_FILE.FILE_CONTENT	AS "fileContentType",
+		FROM BOARD LEFT OUTER JOIN BOARD_UPLOAD_FILE 
+			ON BOARD.BOARD_ID=BOARD_UPLOAD_FILE.BOARD_ID
+		WHERE BOARD.BOARD_ID=#{boardId}
+	]]>	
+	</select>
+	
+	<update id="updateReadCount" parameterType="int">
+	<![CDATA[
+		UPDATE BOARD
+			SET READ_COUNT = READ_COUNT+1
+		WHERE BOARD_ID=#{boardId}
+	]]>
+	</update>
+	
+	<select id="selectMaxArticleNo" parameterType="int" resultType="int">
+	<![CDATA[
+		SELECT 
+			NVL(MAX(BOARD_ID),0) AS "articleNo"
+		FROM BOARD
+	]]>
+	</select>
+	
+	<select id="selectMaxFileId" parameterType="int" resultType="int">
+	<![CDATA[
+		SELECT
+			NVL(MAX(FILE_ID),0) AS "fileId"
+		FROM BOARD_UPLOAD_FILE
+	]]>
+	</select>
+	
+	<insert id="insertArticle" parameterType="com.codeby.myapp.board.model.Board">
+	<![CDATA[
+		INSERT INTO
+		BOARD
+			(BOARD_ID, CATEGORY_ID, WRITER, EMAIL, PASSWORD, TITLE, CONTENT, WRITE_DATE, MASTER_ID, REPLY_NUMBER, REPLY_STEP)
+		VALUES
+			(#{boardId},#{categoryId},#{writer},#{email},#{password},#{title},#{content},SYSDATE,#{boardId},0,0)
+	]]>
+	</insert>
+	
+	<insert id="insertFileData" parameterType="com.codeby.myapp.board.model.BoardUploadFile">
+		<![CDATA[
+			INSERT INTO
+			BOARD_UPLOAD_FILE
+				(FILE_ID, BOARD_ID, FILE_NAME, FILE_SIZE, FILE_CONTENT_TYPE, FILE_DATA)
+			VALUES
+				(#{fileId},#{boardId},#{fileName}, #{fileSize}, #{fileContentType}, #{fileData})
+		]]>
+	</insert>
+	
+	<select id="getFile" parameterType="int" resultType="com.coderby.myapp.board.model.BoardUploadFile">
+	<![CDATA[
+		SELECT
+			FILE_ID			AS
+			BOARD_ID		AS
+			FILE_NAME		AS
+			FILE_SIZE		AS
+			FILE_CONTENT_TYPE	AS
+			FILE_DATA		AS
+		FROM BOARD_UPLOAD_FILE
+		WHERE FILE_ID=#{fileId}
+	]]>
+	</select>
+	
+	<insert id="updateReplyNumber" parameterType="map">
+	<![CDATA[
+		UPDATE
+			BOARD
+		SET
+			REPLY_NUMBER = REPLY_NUMBER+1
+		WHERE
+			MASTER_ID = #{masterId} AND REPLY_NUMBER > #{replyNumber}
+	]]>
+	</insert>
+	
+	<insert id="replyArticle" parameterType="com.codeby.myapp.board.model.Board">
+	<![CDATA[
+		INSERT INTO
+		BOARD
+			(BOARD_ID, CATEGORY_ID, WRITER, EMAIL, PASSWORD, TITLE, CONTENT, WRITE_DATE, MASTER_ID, REPLY_NUMBER, REPLY_STEP)
+		VALUES
+			{#{boardId}, #{categoryId}, #{writer}, #{email}, #{password}, #{title}, #{content}, SYSDATE, #{masterId}, #{replyNumber}, #{replyStep})
+	]]>
+	</insert>
+	
+	<select id="getPassword" parameterType="int" resultType="string">
+	<![CDATA[
+		SELECT PASSWORD
+		FROM BOARD
+		WHERE BOARD_ID={#boardId}
+	]]>
+	</select>
+	
+	<update id="updateArticle" parameterType="com.codeby.myapp.board.model.Board">
+	<![CDATA[
+		UPDATE
+			BOARD
+		SET
+			CATEGORY_ID=#{category_id}, WRITER=#{writer},
+			EMAIL=#{email}, TITLE=#{title}
+			CONTENT=#{content}, WRITE_DATE=SYSDATE
+		WHERE
+			BOARD_ID=#{boardId}
+	]]>
+	</update>
+	
+	<update id="updateFileData" parameterType="com.codeby.myapp.board.model.BoardUploadFile">
+	<![CDATA[
+	
+	]]>
+	</update>
+	
+</mapper>

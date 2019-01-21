@@ -45,5 +45,10 @@ public class BoardCategory {
 		this.categoryOrder = categoryOrder;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return "BoardCategory [categoryId=" + categoryId + ", categoryClass1=" + categoryClass1 + ", categoryClass2="
+				+ categoryClass2 + ", categoryName=" + categoryName + ", categoryDescription=" + categoryDescription
+				+ ", categoryOrder=" + categoryOrder + "]";
+	}	
 }
