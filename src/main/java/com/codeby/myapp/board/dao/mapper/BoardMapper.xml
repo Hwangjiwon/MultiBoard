@@ -166,8 +166,43 @@
 	
 	<update id="updateFileData" parameterType="com.codeby.myapp.board.model.BoardUploadFile">
 	<![CDATA[
-	
+		UPDATE
+			BOARD_UPLOAD_FILE
+		SET
+			FILE_NAME=#{fileName}, FILE_SIZE=#{fileSize},
+			FILE_CONTENT_TYPE=#{fileContentType}, FILE_DATA=#{fileData}
+		WHERE
+			FILE_ID=#{fileId}
 	]]>
 	</update>
 	
+	<select id="selectDeleteArticle" parameterType="int" resultType="com.codeby.myapp.board.model.Board">
+	<![CDATA[
+		SELECT
+			CATEGORY_ID		AS "categoryId",
+			MASTER_ID		AS "masterId",
+			REPLY_NUMBER	AS "replyNumber",
+		FROM
+			BOARD
+		WHERE
+			BOARD_ID = #{boardId}
+	]]>
+	</select>
+	
+	<delete id="deleteFileData" parameterType="int">
+	<![CDATA[
+		DELETE FROM BOARD_UPLOAD_FILE
+		WHERE EXISTS ( SELECT BOARD_ID FROM BOARD
+						WHERE BOARD.MASTER_ID=#{boardId} AND BOARD.BOARD_ID = BOARD_UPLOAD_FILE.BOARD_ID)
+	]]>
+	</delete>
+	
+	<delete id="deleteReplyfileData" parameterType="int">
+	<![CDATA[
+		DELETE FROM BOARD_UPLOAD_FILE
+		WHERE EXISTS ( SELECT BOARD_ID FROM BOARD
+						WHERE BOARD.MASTER_ID=#{boardId} AND BOARD.BOARD_ID = BOARD_UPLOAD_FILE.BOARD_ID)
+	]]>
+	
+	</delete>
 </mapper>
