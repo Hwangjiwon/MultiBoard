@@ -111,12 +111,12 @@
 	<select id="getFile" parameterType="int" resultType="com.coderby.myapp.board.model.BoardUploadFile">
 	<![CDATA[
 		SELECT
-			FILE_ID			AS
-			BOARD_ID		AS
-			FILE_NAME		AS
-			FILE_SIZE		AS
-			FILE_CONTENT_TYPE	AS
-			FILE_DATA		AS
+			FILE_ID			AS	"fileId",
+			BOARD_ID		AS	"boardId",
+			FILE_NAME		AS	"fileName",
+			FILE_SIZE		AS	"fileSize",
+			FILE_CONTENT_TYPE	AS	"fileContentType",
+			FILE_DATA		AS	"fileData"
 		FROM BOARD_UPLOAD_FILE
 		WHERE FILE_ID=#{fileId}
 	]]>
@@ -203,6 +203,78 @@
 		WHERE EXISTS ( SELECT BOARD_ID FROM BOARD
 						WHERE BOARD.MASTER_ID=#{boardId} AND BOARD.BOARD_ID = BOARD_UPLOAD_FILE.BOARD_ID)
 	]]>
-	
 	</delete>
+	
+	<delete id="deleteArticleByBoardId" parameterType="map">
+	<![CDATA[
+		DELETE FROM
+			BOARD
+		WHERE
+			BOARD_ID=#{boardId}
+	]]>
+	</delete>
+	
+	<delete id="deleteArticleByMasterId" parameterType="map">
+	<![CDATA[
+		DELETE FROM
+			BOARD
+		WHRRE
+			MASTER_ID=#{boardId}
+	]]>
+	</delete>
+	
+	<select id="selectTototalAarticleCount" resultType="int">
+	<![CDATA[
+		SELECT COUNT(BOARD_ID) AS "count"
+		FROM BOARD
+	]]>
+	</select>
+	
+	<select id="selectTotalArticleCountByCateoryId" parameterType="int">
+	<![CDATA[
+		SELECT COUNT(BOARD_ID) AS "count"
+		FROM BOARD
+		WHERE CATEGORY_ID=#{categoryId}
+	]]>
+	</select>
+	
+	<select id="searchListByCountKeyword" parameterType="hashmap" resultType="com.codeby.myapp.board.model.Board">
+	<![CDATA[
+		SELECT
+			BOARD_ID				AS "boardId",
+			CATEGORY_ID				AS "categoryId",
+			WRITER					AS "writer",
+			EMAIL					AS "email",
+			TITLE					AS "title",
+			WRITE_DATE				AS "writeDate",
+			MASTER_ID				AS "masterId",
+			REPLY_NUMBER			AS "replyNumber",
+			REPLY_STEP				AS "replyStep",
+			READ_COUNT				AS "readCount",
+			RNUM+1					AS "seq"
+		FROM (
+			SELECT
+				BOARD_ID,
+				CATEGORY_ID,
+				WRITER,
+				EMAIL,
+				TITLE,
+				WRITE_DATE,
+				MASTER_ID,
+				REPLY_NUMBER,
+				REPLY_STEP,
+				READ_COUNT,
+				ROWNUM AS RNUM
+			FROM(
+				SELECT * FROM BOARD
+				WHERE
+					TITLE LIKE #{keyword}
+					OR
+					CONTENT LIKE #{keyword}
+				ORDER BY MASTER_ID DESC, REPLY_NUMBER, REPLY_STEP
+			)
+		)	
+		WHERE RNUM BETWEEN #{start} AND #{end}
+	]]>
+	</select>
 </mapper>

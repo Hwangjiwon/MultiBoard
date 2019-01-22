@@ -39,4 +39,8 @@ public interface IBoardRepository {
 	int selectTotalArticleCountByCategoryId(int categoryId);
 	List<Board> searchListByContentKeyword(String keyword);
 	
+	//책에 없는 부분...?
+	List<Board> searchListByContentKeyword(String keyword, int start, int end);
+	int selectTotalArticleCountByKeyword(String keyword);
+	
 }

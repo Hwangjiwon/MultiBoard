@@ -1,1 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.codeby.myapp.board.dao.IBoardCategoryRepository">
+	<select id="selectAllCategory" resultType="com.codeby.myapp.board.model.BoardCategory">
+	<![CDATA[
+		SELECT 
+			CATEGORY_ID		AS "categoryId",
+			CATEGORY_CLASS1	AS "categoryClass1",
+			CATEGORY_CLASS2	AS "categoryClass2",
+			CATEGORY_NAME	AS "categoryName",
+			CATEGORY_DESCRIPTION	AS "categoryDescription",
+			CATEGORY_ORDER	AS	"categoryOrder"
+		FORM BOARD_CATEGORY
+		ORDER BY CATEGORY_ORDER	
+	]]>
+	</select>
+	
+	<select id="selectAllCategoryByClass1" parameterType="int" resultType="com.codeby.myapp.board.model.BoardCategory">
+	<![CDATA[
+		SELECT
+			CATEGORY_ID		AS "categoryId",
+			CATEGORY_CLASS1	AS "categoryClass1",
+			CATEGORY_CLASS2	AS "categoryClass2",
+			CATEGORY_NAME	AS "categoryName",
+			CATEGORY_DESCRIPTION	AS "categoryDescription",
+			CATEGORY_ORDER	AS	"categoryOrder"
+		FROM BOARD_CATEGORY
+		WHERE CATEGORY_CLASS1=#{class1}
+		ORDER BY CATEGORY_ORDER
+	]]>
+	</select>
+	
+	<select id="selectMaxFileId" parameterType="int" resultType="int">
+	<![CDATA[
+		SELECT
+			NVL(MAX(CATEGORY_ID),0) AS "categoryId"
+		FROM BOARD_CATEGORY
+	]]>
+	</select>
+	
+	<insert id="insertNewCategory" parameterType="com.codeby.myapp.board.model.BoardCategory">
+	<![CDATA[
+		INSERT INTO BOARD_CATEGORY
+			(CATEGORY_ID, CATEGORY_CLASS1, CATEGORY_CLASS2, CATEGORY_NAME, CATEGORY_DESCRIPTION, CATEGORY_ORDER)
+		VALUES
+			(SEQ_BOARD_CATEGORY_ID.NEXTVAL, #{categoryClass1}, #{categoryClass2}, #{categoryName}, #{categoryDescription}, #{categoryOrder})
+	]]>
+	</insert>
+	
+	<update id="updateCategory" parameterType="com.codeby.myapp.board.model.BoardCategory">
+	<![CDATA[
+		UPDATE BOARD_CATEGORY
+		SET
+			CATEGORY_CLASS1 = #{categoryClass1},
+			CATEGORY_CLASS2 = #{categoryClass2},
+			CATEGORY_NAME = #{categoryName},
+			CATEGORY_DESCRIPTION = #{categoryDescription},
+			CATEGORY_ORDER = #{categoryOrder}
+		WHERE
+			CATEGORY_ID = #{categoryId}
+	]]>
+	</update>
+	
+	<delete id="deleteCategory" parameterType="int">
+	<![CDATA[
+		DELETE BOARD_CATEGORY
+		WHERE
+			CATEGORY_ID = #{categoryId}
+	]]>
+	</delete>
+
+</mapper>
