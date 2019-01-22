@@ -6,7 +6,7 @@ public class BoardUploadFile {
 	private String fileName;
 	private long fileSize;
 	private String fileContentType;
-	private byte[] fildData;
+	private byte[] fileData;
 	
 	public int getFileId() {
 		return fileId;
@@ -38,11 +38,11 @@ public class BoardUploadFile {
 	public void setFileContentType(String fileContentType) {
 		this.fileContentType = fileContentType;
 	}
-	public byte[] getFildData() {
-		return fildData;
+	public byte[] getFileData() {
+		return fileData;
 	}
-	public void setFildData(byte[] fildData) {
-		this.fildData = fildData;
+	public void setFileData(byte[] fileData) {
+		this.fileData = fileData;
 	}
 	
 	@Override
